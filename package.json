@@ -8,5 +8,8 @@
   },
   "keywords": [],
   "author": "Kamil Bizoń",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.4.2"
+  }
 }
