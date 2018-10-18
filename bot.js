@@ -39,10 +39,18 @@ function getCrypto(currency) {
 
 // Function needed to obtain the most important informations about one desired currency
 function convertJson(response, currency) {
-  let result = JSON.parse(response).result[0];
-  let volume = roundNumber(result['Volume']);
+  let arrayWithAllCurrencies = JSON.parse(response).result;
 
-  return `${result['MarketName']}, Price: ${result['Last']} BTC, Volume: ${volume}`;
+  // Looping to find the right object
+  for (let i = 0; i < arrayWithAllCurrencies.length; i++) {
+    if (arrayWithAllCurrencies[i].MarketName === `BTC-${currency.toUpperCase()}`) {
+      let result = arrayWithAllCurrencies[i];
+      let volume = roundNumber(result['Volume']);
+      console.log(result);
+      return `${result['MarketName']}, Price: ${result['Last']} BTC, Volume: ${volume}`;
+    }
+  }
+  return 'Currency does not exist!';
 }
 
 function roundNumber(number) {
