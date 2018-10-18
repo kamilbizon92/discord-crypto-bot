@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const prefix = '!';
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+const apiUrls = require('./api.json');
 
 // Login as a bot
 const auth = require('./auth.json');
@@ -30,7 +31,7 @@ client.on ('message', (message) => {
 
 // Function returns informations (volume and price) about one currency
 function getCrypto(currency, flags) {
-  const url = 'https://bittrex.com/api/v1.1/public/getmarketsummaries';
+  const url = apiUrls.bittrex;
   let api_request = new XMLHttpRequest();
   api_request.open('GET', url, false);
   api_request.send(null);
@@ -81,7 +82,7 @@ function convertPrice(array, flags) {
       usd = array[i].Last;
     }
   }
-  console.log(currencyPrice(['USD']));
+  
   // Return bitcoin value in specific currency
   if (flags.length === 0) {
     return usd;
@@ -99,25 +100,20 @@ function convertPrice(array, flags) {
 // Return in other real currency (if user does not want dollars)
 function currencyPrice(flags) {
   // Currency ratio from european central bank
-  const url = `http://data.fixer.io/api/latest?access_key=${auth.ecb_token}&format=1`;
+  const url = `${apiUrls.ecb}${auth.ecb_token}`;
   let api_request = new XMLHttpRequest();
   api_request.open('GET', url, false);
   api_request.send(null);
 
   // Get rates value from european central bank in JSON format
   let ratesValues = JSON.parse(api_request.responseText).rates;
-  let counter = 0;
   
   for (let i = 0; i < flags.length; i++) {
-    // if (counter === 0) {
-      let flag = flags[i].toUpperCase();
-      if (ratesValues[flag]) {
-        // Counter prevent from multiple currency queries
-        // counter++;
-        // Return ratio dolar/desired currency
-        return ratesValues[flag]/ratesValues['USD'];
-      }
-    // }
+    let flag = flags[i].toUpperCase();
+    if (ratesValues[flag]) {
+      // Return ratio dolar/desired currency
+      return ratesValues[flag]/ratesValues['USD'];
+    }
   }
   return 1/ratesValues['USD'];
 }

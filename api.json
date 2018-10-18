@@ -1,0 +1,4 @@
+{
+  "bittrex": "https://bittrex.com/api/v1.1/public/getmarketsummaries",
+  "ecb": "http://data.fixer.io/api/latest?access_key="
+}
