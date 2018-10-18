@@ -19,7 +19,7 @@ client.on ('message', (message) => {
   if(msg.substring(0, 1) === prefix) {
     let args = msg.substring(1).split(' ');
     // First word after prefix determines currency for which user wants to know price, it is stored in 'command' variable
-    let command = args[0];
+    let command = args[0].toUpperCase();
     // 'value' is variable which contains market name, last price and volume of desired currency
     let value = getCrypto(command);
     message.channel.send(value);
@@ -40,14 +40,27 @@ function getCrypto(currency) {
 // Function needed to obtain the most important informations about one desired currency
 function convertJson(response, currency) {
   let arrayWithAllCurrencies = JSON.parse(response).result;
+  let result;
+  let volume;
 
   // Looping to find the right object
   for (let i = 0; i < arrayWithAllCurrencies.length; i++) {
-    if (arrayWithAllCurrencies[i].MarketName === `BTC-${currency.toUpperCase()}`) {
-      let result = arrayWithAllCurrencies[i];
-      let volume = roundNumber(result['Volume']);
-      console.log(result);
-      return `${result['MarketName']}, Price: ${result['Last']} BTC, Volume: ${volume}`;
+    if (currency === 'BTC') {
+      if (arrayWithAllCurrencies[i].MarketName === `USDT-${currency}`) {
+        result = arrayWithAllCurrencies[i];
+        volume = roundNumber(result['BaseVolume']);
+        console.log(result);
+        
+        return `${result['MarketName']}, Price: ${roundNumber(result['Last'])} USDT, Volume: ${volume} USDT`;
+      }
+    } else {
+      if (arrayWithAllCurrencies[i].MarketName === `BTC-${currency}`) {
+        result = arrayWithAllCurrencies[i];
+        volume = roundNumber(result['Volume']);
+        console.log(result);
+        
+        return `${result['MarketName']}, Price: ${result['Last']} BTC, Volume: ${volume} BTC`;
+      }
     }
   }
   return 'Currency does not exist!';
