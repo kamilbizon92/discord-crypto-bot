@@ -47,30 +47,34 @@ function convertJson(response, currency, flags) {
   let volume;
   let convertedPrice;
   let price = convertPrice(arrayWithAllCurrencies, flags);
-
+  
   // Looping to find the right object
   for (let i = 0; i < arrayWithAllCurrencies.length; i++) {
-    if (currency === 'BTC') {
-      if (arrayWithAllCurrencies[i].MarketName === `USDT-${currency}`) {
-        result = arrayWithAllCurrencies[i];
-        volume = roundNumber(result['BaseVolume']);
-        convertedPrice = roundNumber(result['Last'] * price);
-        console.log(result);
-        
-        return `${result['MarketName']}, Price: ${roundNumber(result['Last']) * currencyPrice(flags)} USDT, Volume: ${volume} USDT`;
-      }
-    } else {
-      if (arrayWithAllCurrencies[i].MarketName === `BTC-${currency}`) {
-        result = arrayWithAllCurrencies[i];
-        volume = roundNumber(result['Volume']);
-        convertedPrice = roundNumber(result['Last']* price);
-        console.log(result);
-
-        return `${result['MarketName']}, Price: ${result['Last']} BTC (${convertedPrice} $), Volume: ${volume} BTC`;
-      }
+    if ((arrayWithAllCurrencies[i].MarketName === `USDT-${currency}`) || (arrayWithAllCurrencies[i].MarketName === `BTC-${currency}`)) {
+      return showResult(arrayWithAllCurrencies[i], price, currency);
     }
   }
   return 'Currency does not exist!';
+}
+
+function showResult(cryptoArray, currency, btc) {
+  let result = cryptoArray;
+  let volume;
+  let finalPrice = roundNumber(result['Last'] * currency[1]);
+
+  // Bitcoin value in USD and the other currencies
+  if (btc === 'BTC') {
+    volume = roundNumber(result['BaseVolume']);
+    if (currency[0] === 'USD') {
+      return `${result['MarketName']}, Price: ${result['Last']} $, Volume: ${volume} $`;
+    } else {
+      let finalPrice = roundNumber(currency[1]);
+      return `${result['MarketName']}, Price: ${finalPrice} ${currency[0]}, Volume: ${volume} $`;
+    }
+  } else {
+    volume = roundNumber(result['Volume']);
+    return `${result['MarketName']}, Price: ${result['Last']} BTC (${finalPrice} ${currency[0]}), Volume: ${volume}`;
+  }
 }
 
 // Convert to real currency if flag is set (default USD)
@@ -82,16 +86,24 @@ function convertPrice(array, flags) {
       usd = array[i].Last;
     }
   }
-  
+  // Store currency symbol and price in currencyArray
+  let currencyArray = [];
   // Return bitcoin value in specific currency
   if (flags.length === 0) {
-    return usd;
+    currencyArray[0] = 'USD';
+    currencyArray[1] = usd;
+    return currencyArray;
   } else {
     for (let i = 0; i < flags.length; i++) {
       if (flags[i].toUpperCase() !== 'USD') {
-        return usd * currencyPrice(flags);
+        // Currency symbol
+        currencyArray[0] = currencyPrice(flags)[0];
+        currencyArray[1] = usd * currencyPrice(flags)[1];
+        return currencyArray;
       } else {
-        return usd;
+        currencyArray[0] = 'USD';
+        currencyArray[1] = usd;
+        return currencyArray;
       }
     }
   }
@@ -107,15 +119,29 @@ function currencyPrice(flags) {
 
   // Get rates value from european central bank in JSON format
   let ratesValues = JSON.parse(api_request.responseText).rates;
-  
+
+  // Help array with name of currency and value
+  let helpArray = [];
+  if (flags.length === 0) {
+    helpArray[0] = 'USD';
+    // Must be divided, because base currency of european central bank API is euro
+    helpArray[1] = 1/ratesValues['USD'];
+    return helpArray;
+  }
+
   for (let i = 0; i < flags.length; i++) {
     let flag = flags[i].toUpperCase();
     if (ratesValues[flag]) {
-      // Return ratio dolar/desired currency
-      return ratesValues[flag]/ratesValues['USD'];
+      helpArray[0] = flag;
+      // Must be divided, because base currency of european central bank API is euro
+      helpArray[1] = ratesValues[flag]/ratesValues['USD'];
+      return helpArray;
+    } else {
+      helpArray[0] = 'USD';
+      helpArray[1] = 1;
+      return helpArray;
     }
   }
-  return 1/ratesValues['USD'];
 }
 
 function roundNumber(number) {
