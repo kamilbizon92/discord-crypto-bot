@@ -43,9 +43,6 @@ function getCrypto(currency, flags) {
 // Function needed to obtain the most important informations about one desired currency
 function convertJson(response, currency, flags) {
   let arrayWithAllCurrencies = JSON.parse(response).result;
-  let result;
-  let volume;
-  let convertedPrice;
   let price = convertPrice(arrayWithAllCurrencies, flags);
   
   // Looping to find the right object
@@ -69,11 +66,11 @@ function showResult(cryptoArray, currency, btc) {
       return `${result['MarketName']}, Price: ${result['Last']} $, Volume: ${volume} $`;
     } else {
       let finalPrice = roundNumber(currency[1]);
-      return `${result['MarketName']}, Price: ${finalPrice} ${currency[0]}, Volume: ${volume} $`;
+      return `${result['MarketName']}, Price: ${finalPrice} ${currency[0]}, Volume: ${roundNumber(volume * currency[2])} ${currency[0]}`;
     }
   } else {
     volume = roundNumber(result['Volume']);
-    return `${result['MarketName']}, Price: ${result['Last']} BTC (${finalPrice} ${currency[0]}), Volume: ${volume}`;
+    return `${result['MarketName']}, Price: ${result['Last']} BTC (${finalPrice} ${currency[0]}), Volume: ${volume} BTC`;
   }
 }
 
@@ -99,6 +96,7 @@ function convertPrice(array, flags) {
         // Currency symbol
         currencyArray[0] = currencyPrice(flags)[0];
         currencyArray[1] = usd * currencyPrice(flags)[1];
+        currencyArray[2] = currencyPrice(flags)[1];
         return currencyArray;
       } else {
         currencyArray[0] = 'USD';
