@@ -4,16 +4,16 @@
 
 - price for bitcoin (default in usd): !btc
 
-![BTC price](https://i.imgur.com/gXfciZI.png)
+![BTC price](https://i.imgur.com/Xbhk5vT.png)
 
-- price for bitcoin in other real currency: !btc currency_acronym
+- price for bitcoin in other real currency: !btc real_currency_acronym
 
 ![BTC price in real currency](https://i.imgur.com/EBEzdCV.png)
 
-- price for the other cryptocurrency (default in usd): !other_cryptocurrency currency_acronym
+- price for the other cryptocurrency (default in usd): !other_cryptocurrency
 
 ![Price for the other crypto](https://i.imgur.com/A9FRgxC.png)
 
-- price for the other cryptocurrency in other real currency: !other_cryptocurrency currency_acronym
+- price for the other cryptocurrency in other real currency: !other_cryptocurrency real_currency_acronym
 
 ![Price fro the other crypto in real currency](https://i.imgur.com/QznpfUy.png)
